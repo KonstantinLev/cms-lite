@@ -3,8 +3,7 @@
 require_once 'CmsLite.php';
 use cms\CmsLite;
 
-$cms = new CmsLite();
-
-var_dump($_POST);
-
-return $cms->save($_POST['action'], $_POST['data']);
+//TODO избавиться от пути
+$file = 'config.json';
+$cms = new CmsLite($file);
+echo $cms->ajax($_POST['action'], $_POST['data']);
