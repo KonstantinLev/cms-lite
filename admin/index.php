@@ -117,7 +117,7 @@ $cms = new CmsLite($file);
 
                                     <div class="row">
                                         <div class="col-md-10 text-center">
-                                            <a href="#" class="meta-plus" onclick="addMetaBlock('meta_tags');"><i class="fal fa-plus-circle"></i></a>
+                                            <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'meta_tags');"><i class="fal fa-plus-circle"></i></a>
                                         </div>
                                     </div>
 
@@ -186,7 +186,7 @@ $cms = new CmsLite($file);
 
                                     <div class="row">
                                         <div class="col-md-10 text-center">
-                                            <a href="#" class="meta-plus" onclick="addMetaBlock('og_tags');"><i class="fal fa-plus-circle"></i></a>
+                                            <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'og_tags');"><i class="fal fa-plus-circle"></i></a>
                                         </div>
                                     </div>
 

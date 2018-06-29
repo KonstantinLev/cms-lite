@@ -154,7 +154,7 @@ function saveOGTagTab()
 /**
  * Add new meta-block
  */
-function addMetaBlock(type)
+function addMetaBlock(obj, type)
 {
     var fields = '<div class="block-meta-item">\n' +
         '                                        <div class="row">\n' +
@@ -174,7 +174,7 @@ function addMetaBlock(type)
         '                                            </div>\n' +
         '                                        </div>\n' +
         '                                    </div>';
-    $('.block-meta').append(fields);
+    $(obj).closest('.row').prev().append(fields);
 }
 
 /**
