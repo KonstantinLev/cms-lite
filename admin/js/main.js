@@ -255,5 +255,5 @@ $('.launch-demo-og-tag').click(function () {
         $('#modal-demo-meta-tags').find('.modal-body').html(data);
         $('#modal-demo-meta-tags').modal('show');
     },
-        $.ajax(tObj);
+    $.ajax(tObj);
 });

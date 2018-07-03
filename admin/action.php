@@ -1,9 +1,7 @@
 <?php
 
-require_once 'CmsLite.php';
+require_once 'core/CmsLite.php';
 use cms\CmsLite;
 
-//TODO избавиться от пути
-$file = 'config.json';
-$cms = new CmsLite($file);
+$cms = new CmsLite();
 echo $cms->ajax($_POST['action'], $_POST['data']);

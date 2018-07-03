@@ -2,6 +2,8 @@
 
 namespace cms;
 
+require_once 'Helper.php';
+
 /**
  * Class CmsLite
  * @package cms
@@ -11,7 +13,7 @@ class CmsLite
     /**
      * @var string
      */
-    private $_file = 'config.json';
+    private $_file = 'core/config.json';
 
     /**
      * @var mixed
@@ -21,10 +23,12 @@ class CmsLite
     /**
      * @var array
      */
-    private $_defaults = array(
+    private $_defaults = [
         'title' => 'My Awesome Site',
-        'charset' => 'UTF-8',
-    );
+        'meta_tags' => [
+            'charset' => 'UTF-8'
+        ]
+    ];
 
     /**
      * @var array
@@ -37,11 +41,10 @@ class CmsLite
 
     /**
      * CmsLite constructor.
-     * @param $file
      */
-    public function __construct($file)
+    public function __construct()
     {
-        $this->init($file);
+        $this->init();
     }
 
     /**
@@ -238,10 +241,10 @@ class CmsLite
         return true;
     }
 
-    private function init($file)
+    private function init()
     {
         //TODO синглтон?
-        $this->_file = $file;
+        $this->_file = Helper::normalizePath($this->_file);
         if(!file_exists($this->_file)){
             $default = json_encode($this->_defaults);
             file_put_contents($this->_file, $default);
