@@ -44,7 +44,7 @@ window.onbeforeunload = function () {
  */
 function loading(action)
 {
-    if(action == 'show'){
+    if(action === 'show'){
         $('.lightbox').show();
     } else {
         $('.lightbox').hide();
@@ -148,7 +148,7 @@ function saveOGTagTab()
             time: 4
         });
     },
-        $.ajax(tObj);
+    $.ajax(tObj);
 }
 
 /**
@@ -156,17 +156,19 @@ function saveOGTagTab()
  */
 function addMetaBlock(obj, type)
 {
+    var placeholderName = type === 'meta_tags' ? 'example: charset' : 'example: og:title';
+    var placeholderValue = type === 'meta_tags' ? 'example: UTF-8' : 'example: The Rock';
     var fields = '<div class="block-meta-item">\n' +
         '                                        <div class="row">\n' +
         '                                            <input type="hidden" name="type" value="' + type + '">\n' +
         '                                            <div class="col-md-5">\n' +
         '                                                <div class="cl-form-group">\n' +
-        '                                                    <input type="text" placeholder="example: charset" class="cl-input" name="name">\n' +
+        '                                                    <input type="text" placeholder="' + placeholderName + '" class="cl-input" name="name">\n' +
         '                                                </div>\n' +
         '                                            </div>\n' +
         '                                            <div class="col-md-5">\n' +
         '                                                <div class="cl-form-group">\n' +
-        '                                                    <input type="text" placeholder="example: UTF-8" class="cl-input" name="value">\n' +
+        '                                                    <input type="text" placeholder="' + placeholderValue + '" class="cl-input" name="value">\n' +
         '                                                </div>\n' +
         '                                            </div>\n' +
         '                                            <div class="col-md-2">\n' +
@@ -194,66 +196,43 @@ function removeMetaBlock(obj)
  * Show prepare meta-tags
  */
 $('.launch-demo-meta-tag').click(function () {
-    var form = $('#meta-tag-form');
-    var data = form.serializeObject();
-    form.find('div.row').each(function(key,val){
-        var fields = {};
-        var type = $(val).find('input[name="type"]');
-        var name = $(val).find('input[name="name"]');
-        var value = $(val).find('input[name="value"]');
-        fields['type'] = type.val();
-        fields['name'] = name.val();
-        fields['value'] = value.val();
-        data[key] = fields;
+    var form = $(this).parent('form');
+    var type = form.find('input[name="type"]').val();
+    var result = '';
+    form.find('.block-meta-item .row').each(function(key,val){
+        var name = $(val).find('input[name="name"]').val();
+        var value = $(val).find('input[name="value"]').val();
+        if(name === '' || value === '') return true;
+        switch (name){
+            case 'charset':
+                result += "<meta charset=\"" + value +"\">\n";
+                break;
+            default:
+                if(type == 'meta_tags'){
+                    result += "<meta name=\"" + name +"\" content=\"" + value +"\">\n";
+                } else {
+                    result += "<meta property=\"" + name +"\" content=\"" + value +"\">\n";
+                }
+        }
     });
-    delete data.type;
-    delete data.name;
-    delete data.value;
-    var url = form.prop('action');
-    var tObj = Object.create(defObj);
-    tObj.url = url;
-    tObj.type = 'POST';
-    tObj.dataType = 'text';
-    tObj.data.action = 'demo-meta-tag';
-    tObj.data.data = data;
-    tObj.success = function (data) {
-        console.log(data);
-        $('#modal-demo-meta-tags').find('.modal-body').html(data);
-        $('#modal-demo-meta-tags').modal('show');
-    },
-    $.ajax(tObj);
+    $('#modal-demo-meta-tags').find('.modal-body pre code').text(result);
+    $('#modal-demo-meta-tags').modal('show');
 });
 
 /**
- * Show prepare og-tags
+ *
  */
-$('.launch-demo-og-tag').click(function () {
-    var form = $('#og-tag-form');
-    var data = form.serializeObject();
-    form.find('div.row').each(function(key,val){
-        var fields = {};
-        var type = $(val).find('input[name="type"]');
-        var name = $(val).find('input[name="name"]');
-        var value = $(val).find('input[name="value"]');
-        fields['type'] = type.val();
-        fields['name'] = name.val();
-        fields['value'] = value.val();
-        data[key] = fields;
-    });
-    delete data.type;
-    delete data.name;
-    delete data.value;
-    var url = form.prop('action');
+$('.cancel-change').click(function () {
+    var form = $(this).parent('form');
+    var type = form.find('input[name="type"]').val();
     var tObj = Object.create(defObj);
-    tObj.url = url;
+    tObj.url = form.prop('action');
     tObj.type = 'POST';
-    tObj.dataType = 'text';
-    tObj.data.action = 'demo-meta-tag';
-    tObj.data.data = data;
+    tObj.dataType = 'html';
+    tObj.data.action = 'render-meta-blocks';
+    tObj.data.type = type;
     tObj.success = function (data) {
-        console.log(data);
-        $('#modal-demo-meta-tags').find('.modal-body').html(data);
-        $('#modal-demo-meta-tags').modal('show');
+        form.find('.block-meta').html(data);
     },
     $.ajax(tObj);
 });

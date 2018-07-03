@@ -1,6 +1,6 @@
 <?php
 
-namespace cms;
+namespace core;
 
 class Helper
 {

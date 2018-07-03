@@ -1,14 +1,5 @@
 <?php
 
-require_once 'core/CmsLite.php';
-require_once 'core/View.php';
-use cms\CmsLite;
-use cms\View;
-
-/**
- * @var CmsLite
- */
-$cms = new CmsLite();
-$view = new View();
-$view->set('cms', $cms);
-$view->display('main');
+require_once __DIR__.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'cms_autoload.php';
+$app = new core\CmsLite();
+$app->run();

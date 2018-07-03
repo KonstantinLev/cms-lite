@@ -1,8 +1,6 @@
 <?php
 
-namespace cms;
-
-require_once 'Helper.php';
+namespace core;
 
 /**
  * Class CmsLite
@@ -13,7 +11,7 @@ class CmsLite
     /**
      * @var string
      */
-    private $_file = 'core/config.json';
+    private $_file = 'core/config/config.data';
 
     /**
      * @var mixed
@@ -24,10 +22,17 @@ class CmsLite
      * @var array
      */
     private $_defaults = [
+        'access' => [
+            'login' => 'test',
+            'pwd' => '123'
+        ],
         'title' => 'My Awesome Site',
+        'phone' => '',
+        'email' => '',
         'meta_tags' => [
             'charset' => 'UTF-8'
-        ]
+        ],
+        'og_tags' => []
     ];
 
     /**
@@ -40,11 +45,123 @@ class CmsLite
     );
 
     /**
+     * @var User
+     */
+    private $_user;
+
+    /**
+     * @var Router
+     */
+    private $_router;
+
+    /**
+     * @var View
+     */
+    private $_view;
+
+    private $_baseUrl;
+    private $_scriptUrl;
+    private $_scriptFile;
+
+    /**
+     * @var
+     */
+    public static $app;
+
+    /**
      * CmsLite constructor.
      */
     public function __construct()
     {
+        //TODO singleton?
         $this->init();
+        $this->_user = new User();
+        $this->_view = new View();
+        $this->_router = new Router();
+        static::$app = $this;
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function run()
+    {
+        $this->view->set('cms', $this);
+        $route = $this->_router->route();
+        //TODO если не вводили
+        if(!$this->getUser()->isLoggedIn()){
+            $this->view->display($route);
+        } else {
+            $this->view->display('auth');
+        }
+
+    }
+
+    public function getView()
+    {
+        return $this->_view;
+    }
+
+    /**
+     * @param $type
+     * @return string
+     */
+    public function drawMetaBlocks($type)
+    {
+        if($type === 'meta_tags'){
+            $placeholderName = 'example: charset';
+            $placeholderValue = 'example: UTF-8';
+        } else {
+            $placeholderName = 'example: og:title';
+            $placeholderValue = 'example: The Rock';
+        }
+        $default = '
+<div class="block-meta-item">
+    <div class="row">
+        <input type="hidden" name="type" value="'.$type.'">
+        <div class="col-md-5">
+            <div class="cl-form-group">
+                <input type="text" placeholder="'.$placeholderName.'" class="cl-input" name="name">
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="cl-form-group">
+                <input type="text" placeholder="'.$placeholderValue.'" class="cl-input" name="value">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+        </div>
+    </div>
+</div>';
+        $data = $this->get($type);
+        if(!empty($data)){
+            $result = '';
+            foreach ($data as $metaName => $metaVal){
+                $result .= '
+<div class="block-meta-item">
+    <div class="row">
+        <input type="hidden" name="type" value="'.$type.'">
+        <div class="col-md-5">
+            <div class="cl-form-group">
+                <input type="text" placeholder="example: og:title" class="cl-input" name="name" value="'.$metaName.'">
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="cl-form-group">
+                <input type="text" placeholder="example: The Rock" class="cl-input" name="value" value="'.$metaVal.'">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+        </div>
+    </div>
+</div>';
+            }
+            return $result;
+        }
+        return $default;
     }
 
     /**
@@ -83,6 +200,14 @@ class CmsLite
     }
 
     /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->_user;
+    }
+
+    /**
      * @return mixed|string
      */
     public function getOGTags()
@@ -107,7 +232,7 @@ class CmsLite
         return $this->get('title');
     }
 
-    //TODO скорее всего можно объединить демо и обычную генерацию
+    //TODO скорее всего можно объединить og и обычную генерацию
     public function generateMetaTags()
     {
         $tags = $this->get('meta_tags');
@@ -153,41 +278,6 @@ class CmsLite
     }
 
     /**
-     * Show prepare meta-tags
-     * @param $data - output data from form
-     * @return string
-     */
-    public function demoMetaTags($data)
-    {
-        $tags = $data;
-        $result = '';
-        if(!empty($tags)){
-            foreach ($tags as $val){
-                $name = trim($val['name']);
-                $value = trim($val['value']);
-                $name = strtolower($name);
-                $name = htmlspecialchars($name);
-                $value = htmlspecialchars($value);
-                if(empty($value)) continue;
-
-                switch ($name){
-                    case 'charset':
-                        $result .= "<meta charset=\"".$value."\">\n";
-                        break;
-                    default:
-                        if($val['type'] == 'og_tags'){
-                            $result .= "<meta property=\"".$name."\" content=\"".$value."\">\n";
-                        } else {
-                            $result .= "<meta name=\"".$name."\" content=\"".$value."\">\n";
-                        }
-                }
-            }
-        }
-        $result = htmlspecialchars($result);
-        return '<pre><code>'.$result.'</code></pre>';
-    }
-
-    /**
      * @param $action
      * @param $data
      * @return string
@@ -199,26 +289,26 @@ class CmsLite
             case 'meta-tag-tab':
                 if (isset($this->_json['meta_tags'])) unset($this->_json['meta_tags']);
                 foreach ($data as $item){
-                    if(empty(trim($item['value']))) continue;
+                    if(empty(trim($item['name'])) || empty(trim($item['value']))) continue;
                     $this->_set(trim($item['name']), trim($item['value']), trim($item['type']));
                 }
                 break;
             case 'og-tag-tab':
                 if (isset($this->_json['og_tags'])) unset($this->_json['og_tags']);
                 foreach ($data as $item){
-                    if(empty(trim($item['value']))) continue;
+                    if(empty(trim($item['name'])) || empty(trim($item['value']))) continue;
                     $this->_set(trim($item['name']), trim($item['value']), trim($item['type']));
                 }
                 break;
-            case 'demo-meta-tag':
-                return $this->demoMetaTags($data);
+            case 'render-meta-blocks':
+                return $this->drawMetaBlocks($_POST['type']);
             default:
                 foreach ($data as $item){
                     $this->_set($item['name'], $item['value']);
                 }
         }
         //TODO иная обработка ошибок
-        $resultSave = $this->saveJSON();
+        $resultSave = $this->save();
         $resultSave = true; //TODO для теста
         if(!$resultSave){
             $this->_result['success'] = false;
@@ -230,35 +320,49 @@ class CmsLite
 
 
     /**
-     * Save data in JSON
-     * @return bool|int
+     * Save and encode data
      */
-    private function saveJSON()
+    private function save()
     {
-        $data = json_encode($this->_json);
-        $r = file_put_contents($this->_file, $data, LOCK_EX);
+        $data = empty($this->_json) ? $this->_defaults : $this->_json;
+        //TODO проверки
+        $r = file_put_contents($this->_file, base64_encode(json_encode($data)), LOCK_EX);
         if($r === false) return $r;
         return true;
     }
 
-    private function init()
+    /**
+     * Load and decode data
+     */
+    private function load()
     {
-        //TODO синглтон?
-        $this->_file = Helper::normalizePath($this->_file);
-        if(!file_exists($this->_file)){
-            $default = json_encode($this->_defaults);
-            file_put_contents($this->_file, $default);
-        }
-        $this->_json = file_get_contents($this->_file);
-        $this->_json = json_decode($this->_json, true);
         //TODO проверка на корректный декодинг
+        $this->_json = json_decode(base64_decode(file_get_contents($this->_file)), true);
     }
 
+    private function init()
+    {
+        $this->_file = Helper::normalizePath($this->_file);
+        if(!file_exists($this->_file)){
+            $this->save();
+        }
+        $this->load();
+    }
+
+    /**
+     * @param $result
+     * @return string
+     */
     private function prepare($result)
     {
         return json_encode($result);
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @param bool $type
+     */
     private function _set($name, $value, $type = false)
     {
         if($type){
@@ -266,7 +370,47 @@ class CmsLite
         } else {
             $this->_json[$name] = $value;
         }
+    }
 
+    public function getBaseUrl()
+    {
+        if ($this->_baseUrl === null) {
+            $this->_baseUrl = rtrim(dirname($this->getScriptUrl()), '\\/');
+        }
+        return $this->_baseUrl;
+    }
+
+    public function getScriptUrl()
+    {
+        if ($this->_scriptUrl === null) {
+            $scriptFile = $this->getScriptFile();
+            $scriptName = basename($scriptFile);
+            if (isset($_SERVER['SCRIPT_NAME']) && basename($_SERVER['SCRIPT_NAME']) === $scriptName) {
+                $this->_scriptUrl = $_SERVER['SCRIPT_NAME'];
+            } elseif (isset($_SERVER['PHP_SELF']) && basename($_SERVER['PHP_SELF']) === $scriptName) {
+                $this->_scriptUrl = $_SERVER['PHP_SELF'];
+            } elseif (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName) {
+                $this->_scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
+            } elseif (isset($_SERVER['PHP_SELF']) && ($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
+                $this->_scriptUrl = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $scriptName;
+            } elseif (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($scriptFile, $_SERVER['DOCUMENT_ROOT']) === 0) {
+                $this->_scriptUrl = str_replace('\\', '/', str_replace($_SERVER['DOCUMENT_ROOT'], '', $scriptFile));
+            } else {
+                throw new \Exception('Unable to determine the entry script URL.');
+            }
+        }
+        return $this->_scriptUrl;
+    }
+
+    public function getScriptFile()
+    {
+        if (isset($this->_scriptFile)) {
+            return $this->_scriptFile;
+        } elseif (isset($_SERVER['SCRIPT_FILENAME'])) {
+            return $_SERVER['SCRIPT_FILENAME'];
+        } else {
+            throw new \Exception('Unable to determine the entry script file path.');
+        }
     }
 
 }
