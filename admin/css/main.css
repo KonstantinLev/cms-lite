@@ -1,9 +1,12 @@
+html, body, .content{
+    height: 100%;
+}
 body{
     background-color: whitesmoke;
     color: #333;
 }
 .content{
-    padding: 18px 0 0 0;
+    /*padding: 18px 0 0 0;*/
 }
 
 .btn-main{
@@ -16,6 +19,23 @@ body{
     outline: none !important;
 }
 .btn-main:hover{
+    color: #fff;
+    background-color: #F87458;
+}
+
+.btn-admin{
+    margin-top: 45px;
+    padding: 6px 58px;
+    font-size: 18px;
+    background-color: #f07850;
+    color: #fff;
+    -webkit-transition: all ease-in-out 0.1s;
+    -moz-transition: all ease-in-out 0.1s;
+    -o-transition: all ease-in-out 0.1s;
+    transition: all ease-in-out 0.1s;
+    outline: none !important;
+}
+.btn-admin:hover{
     color: #fff;
     background-color: #F87458;
 }
@@ -293,3 +313,68 @@ input::-webkit-input-placeholder {
 }
 
 /**************************************/
+.wrap{
+    background: linear-gradient(to top left, #ef6b50, #f8ce51);
+    background: -webkit-linear-gradient(to top left, #ef6b50, #f8ce51);
+    background: -moz-linear-gradient(to top left, #ef6b50, #f8ce51);
+    background: -o-linear-gradient(to top left, #ef6b50, #f8ce51);
+    background: -ms-linear-gradient(to top left, #ef6b50, #f8ce51);
+    background: linear-gradient(to top left, #ef6b50, #f8ce51);
+    height: 100%;
+}
+.login-block {
+    position: relative;
+    width: 100%;
+    text-align: center;
+
+}
+
+.login-block form {
+    background-color: rgba(255,255,255,0.2);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -o-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+    min-width: 30%;
+    padding: 30px 55px 37px;
+    box-sizing: border-box;
+}
+
+.login-block form h3 {
+    color: #fff;
+}
+
+.login-block form input{
+    outline: none !important;
+    padding: 0 10px;
+    margin: 29px 0 0 0;
+    border: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    background: none;
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    height: 53px;
+    box-sizing: border-box;
+}
+.login-block form input:hover, .login-block form input:focus{
+    border-bottom: 1px solid #fff;
+}
+.login-block form input::-moz-placeholder {
+    color: #b54900;
+}
+.login-block form input::-webkit-input-placeholder {
+    color: #b54900;
+}
+
+
+
+/********************************************/

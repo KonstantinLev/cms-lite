@@ -19,7 +19,7 @@
             <div class="col-md-9">
                 <div class="tab-content">
                     <div id="panel1" class="tab-pane fade in active">
-                        <form id="main-form" action="action.php" method="post">
+                        <form id="main-form" action="ajax.php" method="post">
                             <div class="cl-form-group">
                                 <label class="cl-label" for="title">Название сайта</label>
                                 <input type="text" placeholder="example: My Awesome Site" class="cl-input" name="title" id="title" value="<?=$cms->get('title')?>">
@@ -36,7 +36,7 @@
                         </form>
                     </div>
                     <div id="panel2" class="tab-pane fade">
-                        <form id="meta-tag-form" action="action.php" method="post">
+                        <form id="meta-tag-form" action="ajax.php" method="post">
                             <div class="row">
                                 <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
                                 <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
@@ -53,7 +53,7 @@
 
                             <button type="button" class="btn btn-main" onclick="saveMetaTagTab();">Сохранить</button>
                             <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
-                            <button type="button" class="btn btn-default cancel-change" data-link="action.php">Отмена</button>
+                            <button type="button" class="btn btn-default cancel-change" data-link="ajax.php">Отмена</button>
                         </form>
                     </div>
                     <div id="panel3" class="tab-pane fade">
@@ -66,7 +66,7 @@
                         <h2>Robots.txt</h2>
                     </div>
                     <div id="panel6" class="tab-pane fade">
-                        <form id="og-tag-form" action="action.php" method="post">
+                        <form id="og-tag-form" action="ajax.php" method="post">
                             <div class="row">
                                 <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
                                 <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
@@ -83,7 +83,7 @@
 
                             <button type="button" class="btn btn-main" onclick="saveOGTagTab();">Сохранить</button>
                             <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
-                            <button type="button" class="btn btn-default cancel-change" data-link="action.php">Отмена</button>
+                            <button type="button" class="btn btn-default cancel-change" data-link="ajax.php">Отмена</button>
                         </form>
                     </div>
                 </div>

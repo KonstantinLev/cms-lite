@@ -90,7 +90,7 @@ class CmsLite
         $this->view->set('cms', $this);
         $route = $this->_router->route();
         //TODO если не вводили
-        if(!$this->getUser()->isLoggedIn()){
+        if($this->getUser()->isLoggedIn()){
             $this->view->display($route);
         } else {
             $this->view->display('auth');
