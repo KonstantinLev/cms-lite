@@ -34,7 +34,7 @@ class User
     {
         $this->_login = $login;
         $this->_pwd = $pwd;
-        if (!empty(array_filter(CmsLite::$app->config['access'], [$this, 'findUser']))){
+        if (!empty(array_filter(CmsLite::$app->json['access'], [$this, 'findUser'], ARRAY_FILTER_USE_BOTH))){
             session_start();
             $_SESSION['login'] = $login;
             session_write_close();
@@ -44,11 +44,35 @@ class User
     }
 
     /**
+     * @return string
+     */
+    public function getLogin()
+    {
+        if($this->isLoggedIn()){
+            session_start();
+            $login =$_SESSION['login'];
+            session_write_close();
+            return $login;
+        }
+        return '';
+    }
+
+    /**
+     *
+     */
+    public function logout()
+    {
+        session_start();
+        if(isset($_SESSION['login'])) unset($_SESSION['login']);
+        session_write_close();
+    }
+
+    /**
      * @param $row
      * @return bool
      */
     public function findUser($row)
     {
-        return $row['login'] == $this->_login && $row['password'] == md5($this->_pwd);
+        return $row['login'] == $this->_login && $row['pwd'] == md5($this->_pwd);
     }
 }

@@ -378,3 +378,16 @@ input::-webkit-input-placeholder {
 
 
 /********************************************/
+
+.cms-nav{
+    margin: 0;
+    background-color: #333;
+    border: none;
+    border-radius: 0;
+}
+.cms-nav a{
+    color: #fff!important;
+}
+.cms-nav a:hover{
+    color: #fa8669!important;
+}

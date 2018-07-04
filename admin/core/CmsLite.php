@@ -5,6 +5,10 @@ namespace core;
 /**
  * Class CmsLite
  * @property View view
+ * @property Router router
+ * @property Request request
+ * @property User user
+ * @property array json
  * @package cms
  */
 class CmsLite
@@ -24,8 +28,10 @@ class CmsLite
      */
     private $_defaults = [
         'access' => [
-            'login' => 'test',
-            'pwd' => '123'
+            [
+                'login' => 'test',
+                'pwd' => '827ccb0eea8a706c4c34a16891f84e7b'
+            ]
         ],
         'title' => 'My Awesome Site',
         'phone' => '',
@@ -56,16 +62,17 @@ class CmsLite
     private $_router;
 
     /**
+     * @var Request
+     */
+    private $_request;
+
+    /**
      * @var View
      */
     private $_view;
 
-    private $_baseUrl;
-    private $_scriptUrl;
-    private $_scriptFile;
-
     /**
-     * @var
+     * @var CmsLite
      */
     public static $app;
 
@@ -75,11 +82,119 @@ class CmsLite
     public function __construct()
     {
         //TODO singleton?
-        $this->init();
+        $this->_file = Helper::normalizePath($this->_file);
+        if(!file_exists($this->_file)){
+            $this->save();
+        }
+        $this->load();
         $this->_user = new User();
         $this->_view = new View();
+        $this->_request = new Request();
         $this->_router = new Router();
         static::$app = $this;
+    }
+
+    /**
+     * @return View
+     */
+    public function getView()
+    {
+        return $this->_view;
+    }
+
+    /**
+     * @return Router
+     */
+    public function getRouter()
+    {
+        return $this->_router;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->_request;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJson()
+    {
+        return $this->_json;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->_user;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getTitle()
+    {
+        return $this->get('title');
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getMetaTags()
+    {
+        return $this->get('meta_tags');
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getOGTags()
+    {
+        return $this->get('og_tags');
+    }
+
+    /**
+     * Register meta-tags on page
+     * @return string
+     */
+    public function getRegisterMetaTags()
+    {
+        $r = '';
+        $r .= $this->generateMetaTags();
+        $r .= $this->generateOGTags();
+        return $r;
+    }
+
+    /**
+     * @param $name
+     * @return mixed|string
+     */
+    public function get($name)
+    {
+        if(isset($this->_json[$name])) return $this->_json[$name];
+        if(isset($this->_defaults[$name])) return $this->_defaults[$name];
+        return '';
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __get($name){
+        $getter = 'get' . ucfirst($name);
+        if (method_exists($this, $getter)) {
+            return $this->$getter();
+        } elseif (method_exists($this, 'set' . ucfirst($name))) {
+            throw new \Exception('Getting write-only property: ' . get_class($this) . '::' . $name);
+        } else {
+            throw new \Exception('Getting unknown property: ' . get_class($this) . '::' . $name);
+        }
     }
 
     /**
@@ -88,20 +203,14 @@ class CmsLite
      */
     public function run()
     {
-        $this->view->set('cms', $this);
-        $route = $this->_router->route();
-        //TODO если не вводили
-        if($this->getUser()->isLoggedIn()){
-            $this->view->display($route);
+        $action = $this->router->getRoute();
+        $action = 'action'.ucfirst($action);
+        $controller = new Controller();
+        if(method_exists($controller, $action)){
+            $controller->$action();
         } else {
-            $this->view->display('auth');
+            $this->notFound();
         }
-
-    }
-
-    public function getView()
-    {
-        return $this->_view;
     }
 
     /**
@@ -165,74 +274,6 @@ class CmsLite
         return $default;
     }
 
-    /**
-     * @param $name
-     * @return mixed|string
-     */
-    public function get($name)
-    {
-        if(isset($this->_json[$name])) return $this->_json[$name];
-        if(isset($this->_defaults[$name])) return $this->_defaults[$name];
-        return '';
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     * @throws \Exception
-     */
-    public function __get($name){
-        $getter = 'get' . ucfirst($name);
-        if (method_exists($this, $getter)) {
-            return $this->$getter();
-        } elseif (method_exists($this, 'set' . ucfirst($name))) {
-            throw new \Exception('Getting write-only property: ' . get_class($this) . '::' . $name);
-        } else {
-            throw new \Exception('Getting unknown property: ' . get_class($this) . '::' . $name);
-        }
-    }
-
-    /**
-     * @return mixed|string
-     */
-    public function getMetaTags()
-    {
-        return $this->get('meta_tags');
-    }
-
-    /**
-     * @return User
-     */
-    public function getUser()
-    {
-        return $this->_user;
-    }
-
-    /**
-     * @return mixed|string
-     */
-    public function getOGTags()
-    {
-        return $this->get('og_tags');
-    }
-
-    /**
-     * Register meta-tags on page
-     * @return string
-     */
-    public function getRegisterMetaTags()
-    {
-        $r = '';
-        $r .= $this->generateMetaTags();
-        $r .= $this->generateOGTags();
-        return $r;
-    }
-
-    public function getTitle()
-    {
-        return $this->get('title');
-    }
-
     //TODO скорее всего можно объединить og и обычную генерацию
     public function generateMetaTags()
     {
@@ -286,6 +327,7 @@ class CmsLite
     public function ajax($action, $data)
     {
         //TODO приводить в нижний регистр + экранирование
+        //TODO защита аякс при неавторизованном пользователе
         switch ($action){
             case 'meta-tag-tab':
                 if (isset($this->_json['meta_tags'])) unset($this->_json['meta_tags']);
@@ -341,15 +383,6 @@ class CmsLite
         $this->_json = json_decode(base64_decode(file_get_contents($this->_file)), true);
     }
 
-    private function init()
-    {
-        $this->_file = Helper::normalizePath($this->_file);
-        if(!file_exists($this->_file)){
-            $this->save();
-        }
-        $this->load();
-    }
-
     /**
      * @param $result
      * @return string
@@ -373,45 +406,12 @@ class CmsLite
         }
     }
 
-    public function getBaseUrl()
+    /**
+     * Go to page 404
+     */
+    private function notFound()
     {
-        if ($this->_baseUrl === null) {
-            $this->_baseUrl = rtrim(dirname($this->getScriptUrl()), '\\/');
-        }
-        return $this->_baseUrl;
+        $controller = new Controller();
+        $controller->notFound();
     }
-
-    public function getScriptUrl()
-    {
-        if ($this->_scriptUrl === null) {
-            $scriptFile = $this->getScriptFile();
-            $scriptName = basename($scriptFile);
-            if (isset($_SERVER['SCRIPT_NAME']) && basename($_SERVER['SCRIPT_NAME']) === $scriptName) {
-                $this->_scriptUrl = $_SERVER['SCRIPT_NAME'];
-            } elseif (isset($_SERVER['PHP_SELF']) && basename($_SERVER['PHP_SELF']) === $scriptName) {
-                $this->_scriptUrl = $_SERVER['PHP_SELF'];
-            } elseif (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName) {
-                $this->_scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
-            } elseif (isset($_SERVER['PHP_SELF']) && ($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
-                $this->_scriptUrl = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $scriptName;
-            } elseif (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($scriptFile, $_SERVER['DOCUMENT_ROOT']) === 0) {
-                $this->_scriptUrl = str_replace('\\', '/', str_replace($_SERVER['DOCUMENT_ROOT'], '', $scriptFile));
-            } else {
-                throw new \Exception('Unable to determine the entry script URL.');
-            }
-        }
-        return $this->_scriptUrl;
-    }
-
-    public function getScriptFile()
-    {
-        if (isset($this->_scriptFile)) {
-            return $this->_scriptFile;
-        } elseif (isset($_SERVER['SCRIPT_FILENAME'])) {
-            return $_SERVER['SCRIPT_FILENAME'];
-        } else {
-            throw new \Exception('Unable to determine the entry script file path.');
-        }
-    }
-
 }
