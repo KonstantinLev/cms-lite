@@ -4,6 +4,7 @@ namespace core;
 
 /**
  * Class CmsLite
+ * @property View view
  * @package cms
  */
 class CmsLite
