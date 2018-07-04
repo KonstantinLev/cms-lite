@@ -48,7 +48,6 @@ class Controller
     public function notFound()
     {
         header("HTTP/1.0 404 Not Found");
-        //$route = explode('/', NOT_FOUND);
         $this->render('not-found', [
             'title' => '404 Not Found'
         ]);

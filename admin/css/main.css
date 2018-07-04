@@ -72,6 +72,25 @@ input::-webkit-input-placeholder {
     outline: none !important;
 }
 
+.cl-textarea{
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid #b5b5b5;
+    background: #fff7ec;
+    font-size: 22px;
+    font-weight: 300;
+    color: #000;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-transition: all ease-in-out 0.1s;
+    -moz-transition: all ease-in-out 0.1s;
+    -o-transition: all ease-in-out 0.1s;
+    transition: all ease-in-out 0.1s;
+    outline: none !important;
+    resize: none;
+}
+
 .cl-label{
     font-size: 14px;
     line-height: 14px;

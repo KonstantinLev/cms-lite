@@ -38,6 +38,15 @@ window.onbeforeunload = function () {
     loading('show');
 };
 
+$('.cl-tab-nav a').click(function(e){
+    e.preventDefault();
+    $(this).tab('show');
+    window.location.hash = $(this).attr('href');
+});
+
+var hash = window.location.hash;
+$('.cl-tab-nav a[href="' + hash + '"]').tab('show');
+
 /**
  * Toggle loader
  * @param action
@@ -149,6 +158,44 @@ function saveOGTagTab()
         });
     },
     $.ajax(tObj);
+}
+
+function saveMetrics(obj)
+{
+    var form = $(obj).closest('form');
+    var url = form.prop('action');
+    var tObj = Object.create(defObj);
+    var data = form.serializeObject();
+    console.log(form);
+    form.find('.cl-field').each(function(key,val){
+        console.log(val);
+        var fields = {};
+
+        var name = $(val).attr('name');
+        console.log(name);
+
+        // fields['type'] = type.val();
+        // fields['name'] = name.val();
+        // fields['value'] = value.val();
+        // data[key] = fields;
+    });
+    // delete data.type;
+    // delete data.name;
+    // delete data.value;
+    // tObj.url = url;
+    // tObj.type = 'POST';
+    // tObj.data.action = 'og-tag-tab';
+    // tObj.data.data = data;
+    //
+    // tObj.success = function (data) {
+    //     var text = data.error || "OG-теги успешно сохранены!";
+    //     note({
+    //         content: text,
+    //         type: data.type,
+    //         time: 4
+    //     });
+    // },
+    // $.ajax(tObj);
 }
 
 /**

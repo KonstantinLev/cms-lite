@@ -1,3 +1,11 @@
+<?php
+
+/* @var $cms core\CmsLite */
+
+use core\Url;
+
+?>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
@@ -19,7 +27,7 @@
             <div class="col-md-9">
                 <div class="tab-content">
                     <div id="panel1" class="tab-pane fade in active">
-                        <form id="main-form" action="<?=\core\Url::to('ajax')?>" method="post">
+                        <form id="main-form" action="<?=Url::to('ajax')?>" method="post">
                             <div class="cl-form-group">
                                 <label class="cl-label" for="title">Название сайта</label>
                                 <input type="text" placeholder="example: My Awesome Site" class="cl-input" name="title" id="title" value="<?=$cms->get('title')?>">
@@ -53,11 +61,21 @@
 
                             <button type="button" class="btn btn-main" onclick="saveMetaTagTab();">Сохранить</button>
                             <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
-                            <button type="button" class="btn btn-default cancel-change" data-link="<?=\core\Url::to('ajax')?>">Отмена</button>
+                            <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
                         </form>
                     </div>
                     <div id="panel3" class="tab-pane fade">
-                        <h2>Метрики</h2>
+                        <form action="<?=Url::to('ajax')?>">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>Введите код счетчика Google Analytics или Яндекс.Метрики, чтобы отслеживать статистику вашего сайта</p>
+                                    <div class="cl-form-group">
+                                        <textarea class="cl-textarea cl-field" name="metriks" id="" cols="6" rows="6"></textarea>
+                                    </div>
+                                    <button type="button" class="btn btn-main" onclick="saveMetrics(this);">Сохранить</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div id="panel4" class="tab-pane fade">
                         <h2>Favicon</h2>
@@ -66,7 +84,7 @@
                         <h2>Robots.txt</h2>
                     </div>
                     <div id="panel6" class="tab-pane fade">
-                        <form id="og-tag-form" action="<?=\core\Url::to('ajax')?>" method="post">
+                        <form id="og-tag-form" action="<?=Url::to('ajax')?>" method="post">
                             <div class="row">
                                 <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
                                 <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
@@ -83,7 +101,7 @@
 
                             <button type="button" class="btn btn-main" onclick="saveOGTagTab();">Сохранить</button>
                             <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
-                            <button type="button" class="btn btn-default cancel-change" data-link="<?=\core\Url::to('ajax')?>">Отмена</button>
+                            <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
                         </form>
                     </div>
                 </div>

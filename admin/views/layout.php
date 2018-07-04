@@ -1,3 +1,8 @@
+<?php
+
+use core\Url;
+
+?>
 <!doctype html>
 <html lang="ru">
 <head>
@@ -5,10 +10,10 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="libs/bootstrap.min.css">
-    <link rel="stylesheet" href="libs/bootstrap.min.css.map">
-    <link rel="stylesheet" href="libs/fontawesome-all.min.css">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="<?=Url::goHome()?>/libs/bootstrap.min.css">
+    <link rel="stylesheet" href="<?=Url::goHome()?>/libs/bootstrap.min.css.map">
+    <link rel="stylesheet" href="<?=Url::goHome()?>/libs/fontawesome-all.min.css">
+    <link rel="stylesheet" href="<?=Url::goHome()?>/css/main.css">
     <title>CMS Lite!</title>
 </head>
 <body>
@@ -25,7 +30,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">CMS Lite</a>
+                    <a class="navbar-brand" href="<?=\core\Url::goHome()?>">CMS Lite</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right">
@@ -56,9 +61,9 @@
     </div>
 </div>
 
-<script src="libs/jquery.min.js"></script>
-<script src="libs/bootstrap.min.js"></script>
-<script src="js/note.js"></script>
-<script src="js/main.js"></script>
+<script src="<?=Url::goHome()?>/libs/jquery.min.js"></script>
+<script src="<?=Url::goHome()?>/libs/bootstrap.min.js"></script>
+<script src="<?=Url::goHome()?>/js/note.js"></script>
+<script src="<?=Url::goHome()?>/js/main.js"></script>
 </body>
 </html>

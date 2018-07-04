@@ -3,12 +3,6 @@
 namespace core;
 
 /**
- * @property array request
- * @property array post
- * @property array get
- * @property bool isPost
- * @property bool isAjax
- * @property bool isGet
  * @property string url
  * @property string baseUrl
  * @property string scriptFile
@@ -18,28 +12,7 @@ class Request
     private $scriptFile;
     private $scriptUrl;
     private $baseUrl;
-
-//    private $isPost = false;
-//    private $isGet = false;
-//
-//    private $get;
-//    private $post;
-//
-//    private $request;
-
-    public function __construct()
-    {
-//        if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-//            $this->isPost = true;
-//        }
-//        if ($_SERVER['REQUEST_METHOD'] === 'GET'){
-//            $this->isGet = true;
-//        }
-//        $this->get = $_GET;
-//        $this->post = $_POST;
-//        $this->request = array_merge($this->get, $this->post/*, $this->files*/);
-    }
-
+    
     public function getBaseUrl()
     {
         if ($this->baseUrl === null) {
@@ -80,16 +53,4 @@ class Request
             throw new \Exception('Unable to determine the entry script file path.');
         }
     }
-
-//    public function getRequest(){
-//        return $this->request;
-//    }
-//
-//    public function request($name){
-//        if (isset($this->request[$name])){
-//            return $this->request[$name];
-//        }
-//        return null;
-//    }
-
 }
