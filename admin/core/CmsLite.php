@@ -1,6 +1,7 @@
 <?php
 
 namespace core;
+use Loader;
 
 /**
  * Class CmsLite
@@ -9,14 +10,21 @@ namespace core;
  * @property Request request
  * @property User user
  * @property array json
+ * @property string robotsTxt
  * @package cms
  */
 class CmsLite
 {
     /**
+     * Configure file
      * @var string
      */
     private $_file = 'core/config/config.data';
+
+    /**
+     * @var
+     */
+    private $_robotsTxtFile;
 
     /**
      * @var mixed
@@ -82,7 +90,7 @@ class CmsLite
     public function __construct()
     {
         //TODO singleton?
-        $this->_file = Helper::normalizePath($this->_file);
+        $this->_file = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . $this->_file);
         if(!file_exists($this->_file)){
             $this->save();
         }
@@ -91,6 +99,7 @@ class CmsLite
         $this->_view = new View();
         $this->_request = new Request();
         $this->_router = new Router();
+        $this->_robotsTxtFile = Loader::$rootDir . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR .'robots.txt';
         static::$app = $this;
     }
 
@@ -179,6 +188,22 @@ class CmsLite
     }
 
     /**
+     * @return bool|string
+     */
+    public function getRobotsTxt()
+    {
+        return is_file($this->_robotsTxtFile) ? file_get_contents($this->_robotsTxtFile) : '';
+    }
+
+    /**
+     * @param $data
+     */
+    public function setRobotsTxt($data)
+    {
+        file_put_contents($this->_robotsTxtFile, $data, LOCK_EX);
+    }
+
+    /**
      * @param $name
      * @return mixed|string
      */
@@ -202,6 +227,23 @@ class CmsLite
             throw new \Exception('Getting write-only property: ' . get_class($this) . '::' . $name);
         } else {
             throw new \Exception('Getting unknown property: ' . get_class($this) . '::' . $name);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @throws \Exception
+     */
+    public function __set($name, $value)
+    {
+        $setter = 'set' . ucfirst($name);
+        if (method_exists($this, $setter)) {
+            call_user_func([$this, $setter], $value);
+        } elseif (method_exists($this, 'get' . ucfirst($name))) {
+            throw new \Exception('Setting read-only property: ' . get_class($this) . '::' . $name);
+        } else {
+            throw new \Exception('Setting unknown property: ' . get_class($this) . '::' . $name);
         }
     }
 
@@ -249,7 +291,7 @@ class CmsLite
             </div>
         </div>
         <div class="col-md-2">
-            <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+            <a rel="nofollow" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
         </div>
     </div>
 </div>';
@@ -272,7 +314,7 @@ class CmsLite
             </div>
         </div>
         <div class="col-md-2">
-            <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+            <a rel="nofollow" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
         </div>
     </div>
 </div>';
@@ -287,7 +329,7 @@ class CmsLite
     {
         $tags = $this->get('meta_tags');
         $result = '';
-        //TODO проверить
+        //TODO проверить и убрать тримы и прочее
         if(!empty($tags)){
             foreach ($tags as $name => $val){
                 $name = trim($name);
@@ -385,6 +427,12 @@ class CmsLite
                     $this->_result['message'] = 'Нет данных для сохранения!';
                     $this->_result['type'] = 'warn';
                 }
+                return $this->prepare($this->_result);
+            case 'save-robots':
+                $this->robotsTxt = $data['robots'];
+                $this->_result['success'] = true;
+                $this->_result['message'] = 'Файл Robots.txt успешно сохранен!';
+                $this->_result['type'] = 'success';
                 return $this->prepare($this->_result);
             default:
                 //TODO

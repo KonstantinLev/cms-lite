@@ -152,17 +152,14 @@ function addMetaBlock(obj, type)
         '                                                </div>\n' +
         '                                            </div>\n' +
         '                                            <div class="col-md-2">\n' +
-        '                                                <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>\n' +
+        '                                                <a rel="nofollow" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>\n' +
         '                                            </div>\n' +
         '                                        </div>\n' +
         '                                    </div>';
     $(obj).closest('.row').prev().append(fields);
 }
 
-/**
- * Remove meta block
- * @param obj
- */
+
 function removeMetaBlock(obj)
 {
     if($(obj).closest('.block-meta').find('.block-meta-item').length > 1) {
@@ -171,6 +168,18 @@ function removeMetaBlock(obj)
         $(obj).closest('.block-meta-item').find('input').val('');
     }
 }
+
+/**
+ * Remove meta block
+ * @param obj
+ */
+$('.meta-times').click(function(e){
+   e.preventDefault();
+});
+
+$('.meta-plus').click(function(e){
+    e.preventDefault();
+});
 
 /**
  * Show prepare meta-tags

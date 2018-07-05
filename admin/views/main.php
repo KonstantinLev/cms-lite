@@ -81,7 +81,17 @@ use core\Url;
                         <h2>Favicon</h2>
                     </div>
                     <div id="panel5" class="tab-pane fade">
-                        <h2>Robots.txt</h2>
+                        <form action="<?=Url::to('ajax')?>">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>Редактирование файла <i>Robots.txt</i></p>
+                                    <div class="cl-form-group">
+                                        <textarea class="cl-textarea cl-field" name="robots" id="" cols="6" rows="10" ><?=$cms->getRobotsTxt()?></textarea>
+                                    </div>
+                                    <button type="button" class="btn btn-main" data-action="save-robots" onclick="saveData(this);">Сохранить</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div id="panel6" class="tab-pane fade">
                         <form id="og-tag-form" action="<?=Url::to('ajax')?>" method="post">

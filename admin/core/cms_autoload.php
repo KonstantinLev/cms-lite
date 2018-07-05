@@ -1,4 +1,5 @@
 <?php
+
 class Loader {
     public static $rootDir;
     public static function autoload($className){
