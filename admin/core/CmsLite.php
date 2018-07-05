@@ -46,9 +46,9 @@ class CmsLite
      * @var array
      */
     private $_result = array(
-        'success' => true,
-        'error' => false,
-        'type' => 'success'
+        'success' => '',
+        'message' => '',
+        'type' => ''
     );
 
     /**
@@ -168,6 +168,14 @@ class CmsLite
         $r .= $this->generateMetaTags();
         $r .= $this->generateOGTags();
         return $r;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getMetrics()
+    {
+        return $this->get('metrics');
     }
 
     /**
@@ -326,39 +334,84 @@ class CmsLite
      */
     public function ajax($action, $data)
     {
-        //TODO приводить в нижний регистр + экранирование
-        //TODO защита аякс при неавторизованном пользователе
         switch ($action){
-            case 'meta-tag-tab':
-                if (isset($this->_json['meta_tags'])) unset($this->_json['meta_tags']);
-                foreach ($data as $item){
-                    if(empty(trim($item['name'])) || empty(trim($item['value']))) continue;
-                    $this->_set(trim($item['name']), trim($item['value']), trim($item['type']));
+            case 'save-main-tab':
+                $result = $this->saveDataFromAjax($data);
+                if($result == 'TRUE'){
+                    $this->_result['success'] = true;
+                    $this->_result['message'] = 'Данные успешно сохранены!';
+                    $this->_result['type'] = 'success';
+                } elseif ($result == 'FALSE'){
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Не удалось сохранить данные! Попробуйте выполнить операцию еще раз или обратитесь в службу поддержки.';
+                    $this->_result['type'] = 'error';
+                } else {
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Нет данных для сохранения!';
+                    $this->_result['type'] = 'warn';
                 }
-                break;
-            case 'og-tag-tab':
-                if (isset($this->_json['og_tags'])) unset($this->_json['og_tags']);
-                foreach ($data as $item){
-                    if(empty(trim($item['name'])) || empty(trim($item['value']))) continue;
-                    $this->_set(trim($item['name']), trim($item['value']), trim($item['type']));
-                }
-                break;
+                return $this->prepare($this->_result);
             case 'render-meta-blocks':
                 return $this->drawMetaBlocks($_POST['type']);
-            default:
-                foreach ($data as $item){
-                    $this->_set($item['name'], $item['value']);
+            case 'save-tags':
+                $result = $this->saveDataFromAjax($data);
+                $tagName = $data['type'] == 'meta_tags' ? 'Мета-теги' : 'Open Graph теги';
+                if($result == 'TRUE'){
+                    $this->_result['success'] = true;
+                    $this->_result['message'] = $tagName.' успешно сохранены!';
+                    $this->_result['type'] = 'success';
+                } elseif ($result == 'FALSE'){
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Не удалось сохранить '.$tagName.'! Попробуйте выполнить операцию еще раз или обратитесь в службу поддержки.';
+                    $this->_result['type'] = 'error';
+                } else {
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Нет данных для сохранения!';
+                    $this->_result['type'] = 'warn';
                 }
+                return $this->prepare($this->_result);
+            case 'save-metrics':
+                $result = $this->saveDataFromAjax($data);
+                if($result == 'TRUE'){
+                    $this->_result['success'] = true;
+                    $this->_result['message'] = 'Код метрики успешно сохранен!';
+                    $this->_result['type'] = 'success';
+                } elseif ($result == 'FALSE'){
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Не удалось сохранить код метрики! Попробуйте выполнить операцию еще раз или обратитесь в службу поддержки.';
+                    $this->_result['type'] = 'error';
+                } else {
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Нет данных для сохранения!';
+                    $this->_result['type'] = 'warn';
+                }
+                return $this->prepare($this->_result);
+            default:
+                //TODO
         }
-        //TODO иная обработка ошибок
-        $resultSave = $this->save();
-        $resultSave = true; //TODO для теста
-        if(!$resultSave){
-            $this->_result['success'] = false;
-            $this->_result['error'] = 'Не удалось сохранить настройки сайта! Попробуйте выполнить операцию позже или обратитесь в службу поддержки.';
-            $this->_result['type'] = 'error';
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    private function saveDataFromAjax($data)
+    {
+        $type = $data['type'] !== '' ? $data['type'] : false;
+        if($type){
+            if (isset($this->_json[$type])) unset($this->_json[$type]);
         }
-        return $this->prepare($this->_result);
+        if(is_array($data) && !empty($data)){
+            foreach ($data as $item){
+                if(!is_array($item)) continue;
+                $name = strtolower(trim($item['name']));
+                $value = trim($item['value']);
+                if(empty($name) || empty($value)) continue;
+                $this->_set($name, $value, $type);
+            }
+            return $this->save() ? 'TRUE' : 'FALSE';
+        }
+        return 'EMPTY';
     }
 
 

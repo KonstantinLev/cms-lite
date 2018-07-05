@@ -30,21 +30,21 @@ use core\Url;
                         <form id="main-form" action="<?=Url::to('ajax')?>" method="post">
                             <div class="cl-form-group">
                                 <label class="cl-label" for="title">Название сайта</label>
-                                <input type="text" placeholder="example: My Awesome Site" class="cl-input" name="title" id="title" value="<?=$cms->get('title')?>">
+                                <input type="text" placeholder="example: My Awesome Site" class="cl-input cl-field" name="title" id="title" value="<?=$cms->get('title')?>">
                             </div>
                             <div class="cl-form-group">
                                 <label class="cl-label" for="phone">Номер телефона</label>
-                                <input type="text" placeholder="example: 8(888)888-88-88" class="cl-input" name="phone" id="phone" value="<?=$cms->get('phone')?>">
+                                <input type="text" placeholder="example: 8(888)888-88-88" class="cl-input cl-field" name="phone" id="phone" value="<?=$cms->get('phone')?>">
                             </div>
                             <div class="cl-form-group">
                                 <label class="cl-label" for="email">E-mail адрес для получения уведомлений с сайта</label>
-                                <input type="text" placeholder="example: my_email@mail.ru" class="cl-input" name="email" id="email" value="<?=$cms->get('email')?>">
+                                <input type="text" placeholder="example: my_email@mail.ru" class="cl-input cl-field" name="email" id="email" value="<?=$cms->get('email')?>">
                             </div>
-                            <button type="button" class="btn btn-main" onclick="saveMainTab();">Сохранить</button>
+                            <button type="button" class="btn btn-main" data-action="save-main-tab" onclick="saveData(this);">Сохранить</button>
                         </form>
                     </div>
                     <div id="panel2" class="tab-pane fade">
-                        <form id="meta-tag-form" action="<?=\core\Url::to('ajax')?>" method="post">
+                        <form id="meta-tag-form" action="<?=Url::to('ajax')?>" method="post">
                             <div class="row">
                                 <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
                                 <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
@@ -59,7 +59,7 @@ use core\Url;
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-main" onclick="saveMetaTagTab();">Сохранить</button>
+                            <button type="button" class="btn btn-main" data-action="save-tags" data-type="meta_tags" onclick="saveTags(this);">Сохранить</button>
                             <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
                             <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
                         </form>
@@ -70,9 +70,9 @@ use core\Url;
                                 <div class="col-md-12">
                                     <p>Введите код счетчика Google Analytics или Яндекс.Метрики, чтобы отслеживать статистику вашего сайта</p>
                                     <div class="cl-form-group">
-                                        <textarea class="cl-textarea cl-field" name="metriks" id="" cols="6" rows="6"></textarea>
+                                        <textarea class="cl-textarea cl-field" name="metrics" id="" cols="6" rows="10" ><?=$cms->getMetrics()?></textarea>
                                     </div>
-                                    <button type="button" class="btn btn-main" onclick="saveMetrics(this);">Сохранить</button>
+                                    <button type="button" class="btn btn-main" data-action="save-metrics" onclick="saveData(this);">Сохранить</button>
                                 </div>
                             </div>
                         </form>
@@ -99,7 +99,7 @@ use core\Url;
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-main" onclick="saveOGTagTab();">Сохранить</button>
+                            <button type="button" class="btn btn-main" data-action="save-tags" data-type="og_tags" onclick="saveTags(this);">Сохранить</button>
                             <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
                             <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
                         </form>
