@@ -111,8 +111,8 @@ function saveData(obj)
     var data = form.serializeObject();
     form.find('.cl-field').each(function(key,val){
         var fields = {};
-        fields['name'] = $(val).attr('name');
         fields['value'] = $(val).val();
+        fields['name'] = $(val).attr('name');
         data[key] = fields;
     });
     data.type = type;
@@ -127,6 +127,37 @@ function saveData(obj)
             type: data.type,
             time: 4
         });
+    },
+    $.ajax(tObj);
+}
+
+function uploadICO(obj)
+{
+    var form = $(obj).closest('form');
+    var action = $(obj).data('action');
+    var url = form.prop('action');
+    var tObj = Object.create(defObj);
+
+    var form_data = new FormData();
+    var file_data = $('#file').prop('files')[0];
+    form_data.append('file', file_data);
+
+    tObj.url = url;
+    tObj.type = 'POST';
+    tObj.cache = false;
+    tObj.contentType = false;
+    tObj.processData = false;
+    tObj.data = form_data;
+
+    tObj.success = function (data) {
+        note({
+            content: data.message,
+            type: data.type,
+            time: 4
+        });
+        var blockPreview = $('.preview-ico');
+        blockPreview.find('img').attr('src', data['link-ico']);
+        blockPreview.show();
     },
     $.ajax(tObj);
 }

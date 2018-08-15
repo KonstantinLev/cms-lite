@@ -85,7 +85,12 @@ class Controller
         if(!CmsLite::$app->user->isLoggedIn()){
             $this->redirect('auth');
         }
-        echo CmsLite::$app->ajax($_POST['action'], $_POST['data']);
+        if(!empty($_FILES)){
+            echo CmsLite::$app->ajax('save-ico', $_FILES['file']);
+        } else {
+            echo CmsLite::$app->ajax($_POST['action'], $_POST['data']);
+        }
+
     }
 
 }

@@ -34,7 +34,7 @@ class User
     {
         $this->_login = $login;
         $this->_pwd = $pwd;
-        if (!empty(array_filter(CmsLite::$app->json['access'], [$this, 'findUser'], ARRAY_FILTER_USE_BOTH))){
+        if (!empty(array_filter(CmsLite::$app->json['access'], [$this, 'findUser']))){
             session_start();
             $_SESSION['login'] = $login;
             session_write_close();
