@@ -134,12 +134,19 @@ function saveData(obj)
 function uploadICO(obj)
 {
     var form = $(obj).closest('form');
-    var action = $(obj).data('action');
     var url = form.prop('action');
     var tObj = Object.create(defObj);
 
     var form_data = new FormData();
     var file_data = $('#file').prop('files')[0];
+    if(file_data === undefined){
+        note({
+            content: 'Необходимо выбрать файл!',
+            type: 'warn',
+            time: 4
+        });
+        return;
+    }
     form_data.append('file', file_data);
 
     tObj.url = url;
