@@ -159,6 +159,15 @@ class CmsLite
         return $this->get('meta_tags');
     }
 
+    public function getFavicon() //todo
+    {
+        $ico = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR .'example.ico');
+        if(file_exists($ico)){
+            return Url::baseCms('img'.DIRECTORY_SEPARATOR.'example.ico');
+        }
+        return null;
+    }
+
     /**
      * @return mixed|string
      */
