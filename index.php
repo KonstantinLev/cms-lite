@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'admin'. DIRECTORY_SEPARATOR .'core'. DIRECTORY_SEPARATOR .'cms_autoload.php';
+
 $cms = new core\CmsLite();
 
 ?>

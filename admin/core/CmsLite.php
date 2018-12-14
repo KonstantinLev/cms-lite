@@ -374,7 +374,7 @@ class CmsLite
      * @param $data
      * @return string
      */
-    public function ajax($action, $data)
+    public function ajax($action, $data = null)
     {
         switch ($action){
             case 'save-main-tab':

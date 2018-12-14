@@ -64,7 +64,7 @@ class Controller
 
     public function actionAuth()
     {
-        if(isset($_POST)){
+        if(!empty($_POST)){
             $login = $_POST['login'];
             $pwd = $_POST['pwd'];
             if($this->user->login($login, $pwd)){
@@ -85,7 +85,7 @@ class Controller
         if(!CmsLite::$app->user->isLoggedIn()){
             $this->redirect('auth');
         }
-        echo CmsLite::$app->ajax($_POST['action'], $_POST['data']);
+        echo CmsLite::$app->ajax($_POST['action'], isset($_POST['data']) ? $_POST['data'] : null);
     }
 
 }
