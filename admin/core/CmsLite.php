@@ -1,6 +1,7 @@
 <?php
 
 namespace core;
+use core\helpers\ICOGenerator;
 use Loader;
 
 /**
@@ -89,7 +90,6 @@ class CmsLite
      */
     public function __construct()
     {
-        //TODO singleton?
         $this->_file = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . $this->_file);
         if(!file_exists($this->_file)){
             $this->save();
@@ -373,6 +373,7 @@ class CmsLite
      * @param $action
      * @param $data
      * @return string
+     * @throws \Exception
      */
     public function ajax($action, $data = null)
     {
@@ -433,6 +434,25 @@ class CmsLite
                 $this->_result['success'] = true;
                 $this->_result['message'] = 'Файл Robots.txt успешно сохранен!';
                 $this->_result['type'] = 'success';
+                return $this->prepare($this->_result);
+            case 'save-ico':
+                $fileName = basename($data['name']);
+                if(!empty($fileName)){
+                    $source = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR.$fileName);
+                    $destination = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR .'example.ico');
+                    move_uploaded_file($data['tmp_name'], $source);
+                    $ico_lib = new ICOGenerator($source, [[32, 32]]);
+                    $ico_lib->saveICO($destination);
+                    unlink($source);
+                    $this->_result['success'] = true;
+                    $this->_result['message'] = 'Favicon успешно установлен!';
+                    $this->_result['type'] = 'success';
+                    $this->_result['link-ico'] = Url::to('img/example.ico');
+                } else {
+                    $this->_result['success'] = false;
+                    $this->_result['message'] = 'Нет данных для сохранения!';
+                    $this->_result['type'] = 'warn';
+                }
                 return $this->prepare($this->_result);
             default:
                 //TODO

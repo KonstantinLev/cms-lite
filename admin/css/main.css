@@ -410,3 +410,18 @@ input::-webkit-input-placeholder {
 .cms-nav a:hover{
     color: #fa8669!important;
 }
+
+#file{
+    opacity: 0;
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+.wrap-file{
+    position: relative;
+    border: 2px dotted #ccc;
+    padding: 5px;
+}
+.preview-ico{
+    display: none;
+}

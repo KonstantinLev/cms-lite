@@ -78,7 +78,19 @@ use core\Url;
                         </form>
                     </div>
                     <div id="panel4" class="tab-pane fade">
-                        <h2>Favicon</h2>
+                        <p>Загрузите изображение favicon для сайта</p>
+                        <form action="<?=Url::to('ajax')?>" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <div class="wrap-file center">
+                                    Нажмите здесь, чтобы прикрепить файл
+                                    <input type="file" name="file" class="cl-field" id="file">
+                                </div>
+                                <p class="nameFile"></p>
+                                <p class="help-block">Подсказка</p>
+                            </div>
+                            <div class="preview-ico"><img src="" alt=""></div>
+                            <button type="button" class="btn btn-main" data-action="save-ico" onclick="uploadICO(this);">Сохранить</button>
+                        </form>
                     </div>
                     <div id="panel5" class="tab-pane fade">
                         <form action="<?=Url::to('ajax')?>">
