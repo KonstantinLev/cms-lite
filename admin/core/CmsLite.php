@@ -28,6 +28,11 @@ class CmsLite
     private $_robotsTxtFile;
 
     /**
+     * @var string
+     */
+    private $_pathFavicon;
+
+    /**
      * @var mixed
      */
     private $_json;
@@ -81,6 +86,13 @@ class CmsLite
     private $_view;
 
     /**
+     * @var array
+     */
+    private $_pages = [];
+
+    private $_activePage = null;
+
+    /**
      * @var CmsLite
      */
     public static $app;
@@ -88,8 +100,11 @@ class CmsLite
     /**
      * CmsLite constructor.
      */
-    public function __construct()
+    public function __construct($pages = [])
     {
+        if(!empty($pages)){
+            $this->_pages = $pages;
+        }
         $this->_file = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . $this->_file);
         if(!file_exists($this->_file)){
             $this->save();
@@ -100,7 +115,33 @@ class CmsLite
         $this->_request = new Request();
         $this->_router = new Router();
         $this->_robotsTxtFile = Loader::$rootDir . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR .'robots.txt';
+        $this->_pathFavicon = Loader::$rootDir . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR .'img'.DIRECTORY_SEPARATOR.'favicon.ico';
         static::$app = $this;
+    }
+
+    public function setPathFavicon($path)
+    {
+        $this->_pathFavicon = $path;
+    }
+
+    public function setPathRobots($path)
+    {
+        $this->_robotsTxtFile = $path;
+    }
+
+    public function setActivePage($pageName)
+    {
+        $this->_activePage = $pageName;
+    }
+
+    public function getActivePage()
+    {
+        return $this->_activePage;
+    }
+
+    public function getPages()
+    {
+        return $this->_pages;
     }
 
     /**
@@ -274,9 +315,10 @@ class CmsLite
 
     /**
      * @param $type
+     * @param null $page
      * @return string
      */
-    public function drawMetaBlocks($type)
+    public function drawMetaBlocks($type, $page = "")
     {
         if($type === 'meta_tags'){
             $placeholderName = 'example: charset';
@@ -304,10 +346,18 @@ class CmsLite
         </div>
     </div>
 </div>';
-        $data = $this->get($type);
+
+
+        if(!empty($page)){
+            $data = $this->get($type);
+            $data = (isset($data[$page])) ? $data[$page] : '';
+        } else {
+            $data = $this->get($type);
+        }
         if(!empty($data)){
             $result = '';
             foreach ($data as $metaName => $metaVal){
+                if(is_array($metaVal)) continue;
                 $result .= '
 <div class="block-meta-item">
     <div class="row">
@@ -337,10 +387,14 @@ class CmsLite
     public function generateMetaTags()
     {
         $tags = $this->get('meta_tags');
+        if($this->_activePage != null){
+            $tags = isset($tags[$this->_activePage]) ? $tags[$this->_activePage] : '';
+        }
         $result = '';
         //TODO проверить и убрать тримы и прочее
         if(!empty($tags)){
             foreach ($tags as $name => $val){
+                if(is_array($val)) continue;
                 $name = trim($name);
                 $value = trim($val);
                 $name = strtolower($name);
@@ -361,10 +415,14 @@ class CmsLite
     public function generateOGTags()
     {
         $tags = $this->get('og_tags');
+        if($this->_activePage != null){
+            $tags = isset($tags[$this->_activePage]) ? $tags[$this->_activePage] : '';
+        }
         $result = '';
         //TODO проверить
         if(!empty($tags)){
             foreach ($tags as $name => $val){
+                if(is_array($val)) continue;
                 $name = trim($name);
                 $value = trim($val);
                 $name = strtolower($name);
@@ -404,7 +462,7 @@ class CmsLite
                 }
                 return $this->prepare($this->_result);
             case 'render-meta-blocks':
-                return $this->drawMetaBlocks($_POST['type']);
+                return $this->drawMetaBlocks($_POST['type'], isset($_POST['page']) ? $_POST['page'] : '');
             case 'save-tags':
                 $result = $this->saveDataFromAjax($data);
                 $tagName = $data['type'] == 'meta_tags' ? 'Мета-теги' : 'Open Graph теги';
@@ -447,16 +505,19 @@ class CmsLite
             case 'save-ico':
                 $fileName = basename($data['name']);
                 if(!empty($fileName)){
-                    $source = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR.$fileName);
-                    $destination = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR .'example.ico');
+                    $favicon = 'favicon.ico';
+                    $sourcePath = Helper::normalizePath(Loader::$rootDir . DIRECTORY_SEPARATOR . 'img');
+                    $destinationPath = $this->_pathFavicon;
+                    $source = $sourcePath.DIRECTORY_SEPARATOR.$fileName;
                     move_uploaded_file($data['tmp_name'], $source);
                     $ico_lib = new ICOGenerator($source, [[32, 32]]);
-                    $ico_lib->saveICO($destination);
+                    $ico_lib->saveICO($sourcePath.DIRECTORY_SEPARATOR.$favicon);
+                    $ico_lib->saveICO($destinationPath.DIRECTORY_SEPARATOR.$favicon);
                     unlink($source);
                     $this->_result['success'] = true;
                     $this->_result['message'] = 'Favicon успешно установлен!';
                     $this->_result['type'] = 'success';
-                    $this->_result['link-ico'] = Url::to('img/example.ico');
+                    $this->_result['link-ico'] = Url::to('img/'.$favicon);
                 } else {
                     $this->_result['success'] = false;
                     $this->_result['message'] = 'Нет данных для сохранения!';
@@ -474,9 +535,15 @@ class CmsLite
      */
     private function saveDataFromAjax($data)
     {
-        $type = $data['type'] !== '' ? $data['type'] : false;
+        $type = isset($data['type']) && $data['type'] !== '' ? $data['type'] : false;
+        $page = isset($data['page']) && $data['page'] !== '' ? $data['page'] : false;
         if($type){
-            if (isset($this->_json[$type])) unset($this->_json[$type]);
+            if($page){
+                if (isset($this->_json[$type][$page])) unset($this->_json[$type][$page]);
+            } else {
+                if (isset($this->_json[$type])) unset($this->_json[$type]);
+            }
+
         }
         if(is_array($data) && !empty($data)){
             foreach ($data as $item){
@@ -484,7 +551,12 @@ class CmsLite
                 $name = strtolower(trim($item['name']));
                 $value = trim($item['value']);
                 if(empty($name) || empty($value)) continue;
-                $this->_set($name, $value, $type);
+                if($page) {
+                    $this->_json[$type][$page][$name] = $value;
+                } else {
+                    $this->_set($name, $value, $type);
+                }
+
             }
             return $this->save() ? 'TRUE' : 'FALSE';
         }

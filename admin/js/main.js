@@ -69,6 +69,7 @@ function saveTags(obj)
     var form = $(obj).closest('form');
     var action = $(obj).data('action');
     var type = $(obj).data('type') || null;
+    var page = form.find('.select-page').val() || null;
     var url = form.prop('action');
     var tObj = Object.create(defObj);
     var data = form.serializeObject();
@@ -81,6 +82,7 @@ function saveTags(obj)
         data[key] = fields;
     });
     data.type = type;
+    data.page = page;
     delete data.name;
     delete data.value;
     tObj.url = url;
@@ -203,7 +205,7 @@ function removeMetaBlock(obj)
     if($(obj).closest('.block-meta').find('.block-meta-item').length > 1) {
         $(obj).closest('.block-meta-item').remove();
     } else {
-        $(obj).closest('.block-meta-item').find('input').val('');
+        $(obj).closest('.block-meta-item').find('input:not([name=type])').val('');
     }
 }
 
@@ -223,7 +225,7 @@ $('.meta-plus').click(function(e){
  * Show prepare meta-tags
  */
 $('.launch-demo-meta-tag').click(function () {
-    var form = $(this).parent('form');
+    var form = $(this).closest('form');
     var type = form.find('input[name="type"]').val();
     var result = '';
     form.find('.block-meta-item .row').each(function(key,val){
@@ -250,16 +252,41 @@ $('.launch-demo-meta-tag').click(function () {
  *
  */
 $('.cancel-change').click(function () {
-    var form = $(this).parent('form');
+    var form = $(this).closest('form');
     var type = form.find('input[name="type"]').val();
+    var page = form.find('.select-page').val() || null;
     var tObj = Object.create(defObj);
     tObj.url = form.prop('action');
     tObj.type = 'POST';
     tObj.dataType = 'html';
     tObj.data.action = 'render-meta-blocks';
     tObj.data.type = type;
+    tObj.data.page = page;
     tObj.success = function (data) {
         form.find('.block-meta').html(data);
+    },
+    $.ajax(tObj);
+});
+
+$('.select-page').change(function () {
+    var that = $(this);
+    var form = $(this).closest('form');
+    var selectPageContainer = form.find('.select-page-container');
+    selectPageContainer.hide();
+    var type = form.find('input[name="type"]').val();
+    var page = $(this).val();
+    if(page == '') return;
+    var tObj = Object.create(defObj);
+    tObj.url = form.prop('action');
+    tObj.type = 'POST';
+    tObj.dataType = 'html';
+    tObj.data.action = 'render-meta-blocks';
+    tObj.data.type = type;
+    tObj.data.page = page;
+    tObj.success = function (data) {
+        form.find('.block-meta').html(data);
+        selectPageContainer.find('.current-page b').text(that.find('option:selected').text());
+        selectPageContainer.show();
     },
     $.ajax(tObj);
 });

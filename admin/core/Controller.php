@@ -59,7 +59,12 @@ class Controller
         if(!CmsLite::$app->user->isLoggedIn()){
             $this->redirect('auth');
         }
-        $this->render('main');
+        $params = [];
+        $pages = CmsLite::$app->pages;
+        if(!empty($pages)){
+            $params['pages'] = $pages;
+        }
+        $this->render('main', $params);
     }
 
     public function actionAuth()
@@ -88,7 +93,7 @@ class Controller
         if(!empty($_FILES)){
             echo CmsLite::$app->ajax('save-ico', $_FILES['file']);
         } else {
-            echo CmsLite::$app->ajax($_POST['action'], $_POST['data']);
+            echo CmsLite::$app->ajax($_POST['action'], isset($_POST['data']) ? $_POST['data'] : null);
         }
 
     }

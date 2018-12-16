@@ -4,6 +4,9 @@
 
 use core\Url;
 
+$pages = $this->pages;
+
+
 ?>
 
 <div class="container-fluid">
@@ -45,23 +48,41 @@ use core\Url;
                     </div>
                     <div id="panel2" class="tab-pane fade">
                         <form id="meta-tag-form" action="<?=Url::to('ajax')?>" method="post">
-                            <div class="row">
-                                <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
-                                <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
-                            </div>
-                            <div class="block-meta">
-                                <?=$cms->drawMetaBlocks('meta_tags')?>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-10 text-center">
-                                    <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'meta_tags');"><i class="fal fa-plus-circle"></i></a>
+                            <?php if(!empty($pages)) { ?>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <select name="select-page" id="" class="form-control select-page">
+                                            <option value="">Выберите страницу...</option>
+                                            <?php foreach ($pages as $key => $page) { ?>
+                                                <option value="<?=$key?>"><?=$page?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
                                 </div>
+                                <hr>
+                            <?php } ?>
+                            <div class="<?=!empty($pages) ? 'select-page-container' : ''?>">
+                                <h3 class="current-page">Настройка тегов для страницы: <b></b></h3>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
+                                    <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
+                                </div>
+                                <div class="block-meta">
+                                    <?=$cms->drawMetaBlocks('meta_tags')?>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-10 text-center">
+                                        <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'meta_tags');"><i class="fal fa-plus-circle"></i></a>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-main" data-action="save-tags" data-type="meta_tags" onclick="saveTags(this);">Сохранить</button>
+                                <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
+                                <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
                             </div>
 
-                            <button type="button" class="btn btn-main" data-action="save-tags" data-type="meta_tags" onclick="saveTags(this);">Сохранить</button>
-                            <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
-                            <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
                         </form>
                     </div>
                     <div id="panel3" class="tab-pane fade">
@@ -86,9 +107,9 @@ use core\Url;
                                     <input type="file" name="file" class="cl-field" id="file">
                                 </div>
                                 <p class="nameFile"></p>
-                                <p class="help-block">Подсказка</p>
+<!--                                <p class="help-block">Подсказка</p>-->
                             </div>
-                            <div class="preview-ico"><img src="" alt=""></div>
+                            <div class="preview-ico">Текущий favicon - <img src="<?=Url::to('img/favicon.ico?'.time())?>" alt=""></div>
                             <button type="button" class="btn btn-main" data-action="save-ico" onclick="uploadICO(this);">Сохранить</button>
                         </form>
                     </div>
@@ -107,23 +128,39 @@ use core\Url;
                     </div>
                     <div id="panel6" class="tab-pane fade">
                         <form id="og-tag-form" action="<?=Url::to('ajax')?>" method="post">
-                            <div class="row">
-                                <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
-                                <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
-                            </div>
-                            <div class="block-meta">
-                                <?=$cms->drawMetaBlocks('og_tags')?>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-10 text-center">
-                                    <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'og_tags');"><i class="fal fa-plus-circle"></i></a>
+                            <?php if(!empty($pages)) { ?>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <select name="select-page" id="" class="form-control select-page">
+                                            <option value="">Выберите страницу...</option>
+                                            <?php foreach ($pages as $key => $page) { ?>
+                                                <option value="<?=$key?>"><?=$page?></option>
+                                            <?php } ?>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                                <hr>
+                            <?php } ?>
+                            <div class="<?=!empty($pages) ? 'select-page-container' : ''?>">
+                                <h3 class="current-page">Настройка тегов для страницы: <b></b></h3>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
+                                    <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
+                                </div>
+                                <div class="block-meta">
+                                    <?=$cms->drawMetaBlocks('og_tags')?>
+                                </div>
 
-                            <button type="button" class="btn btn-main" data-action="save-tags" data-type="og_tags" onclick="saveTags(this);">Сохранить</button>
-                            <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
-                            <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
+                                <div class="row">
+                                    <div class="col-md-10 text-center">
+                                        <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'og_tags');"><i class="fal fa-plus-circle"></i></a>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-main" data-action="save-tags" data-type="og_tags" onclick="saveTags(this);">Сохранить</button>
+                                <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
+                                <button type="button" class="btn btn-default cancel-change" data-link="<?=Url::to('ajax')?>">Отмена</button>
+                            </div>
                         </form>
                     </div>
                 </div>

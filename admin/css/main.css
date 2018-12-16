@@ -422,6 +422,13 @@ input::-webkit-input-placeholder {
     border: 2px dotted #ccc;
     padding: 5px;
 }
-.preview-ico{
+.select-page-container{
     display: none;
+}
+.select-page{
+    border: 1px solid #fa8669;
+    background-color: #fff7ec;
+}
+.current-page{
+    color: #fd5f38;
 }
